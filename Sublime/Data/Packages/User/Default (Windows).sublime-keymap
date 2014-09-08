@@ -1,0 +1,42 @@
+[
+	//Menu Toggles
+	{"keys": ["alt+k", "alt+t"], "command": "toggle_tabs"},
+	{"keys": ["alt+k", "alt+m"], "command": "toggle_minimap"},
+	{"keys": ["alt+k", "alt+,"], "command": "toggle_status_bar"},
+	{"keys": ["alt+k", "alt+f"], "command": "toggle_distraction_free"},
+	{"keys": ["alt+k", "alt+b"], "command": "toggle_side_bar"},
+
+	//Enter Skips Ends
+	{"keys": ["shift+enter"], "command": "move", "args": {"by": "characters", "forward": true}, "context":
+	[
+		{"key": "following_text", "operator": "regex_contains", "operand": "^[)\"\\]\\}]", "match_all": true},
+		{"key": "auto_complete_visible", "operator": "equal", "operand": false}
+	]
+	},
+
+	//move backspace
+	{ "keys" : ["control+u"], "command": "left_delete" },
+	{ "keys" : ["control+shift+u"], "command": "right_delete" },
+
+	{"keys": ["shift+space"], "command": "move", "args": {"by": "subword_ends", "forward": true}},
+	{"keys": ["shift+alt+space"], "command": "move", "args": {"by": "subword_ends", "forward": false}},
+
+	//modified navigation
+	{"keys": ["control+i"], "command": "move", "args":{"by": "lines", "forward": false}},
+	{"keys": ["control+k"], "command": "move", "args":{"by": "lines", "forward": true}},
+	{"keys": ["control+l"], "command": "move", "args":{"by": "characters", "forward": true}},
+	{"keys": ["control+j"], "command": "move", "args":{"by": "characters", "forward": false}},
+
+	{"keys": ["control+alt+l"], "command": "move_to", "args":{"to": "eol"}},
+	{"keys": ["control+alt+j"], "command": "move_to", "args":{"to": "bol"}},
+
+	//Selection
+	{"keys": ["control+alt+shift+l"], "command": "move_to", "args":{"to": "eol", "extend" : true}},
+	{"keys": ["control+alt+shift+j"], "command": "move_to", "args":{"to": "bol"}, "extend" : true},
+
+	{"keys": ["control+shift+i"], "command": "move", "args":{"by": "lines", "forward": false, "extend": true}},
+	{"keys": ["control+shift+k"], "command": "move", "args":{"by": "lines", "forward": true, "extend": true}},
+	{"keys": ["control+shift+l"], "command": "move", "args":{"by": "characters", "forward": true, "extend": true}},
+	{"keys": ["control+shift+j"], "command": "move", "args":{"by": "characters", "forward": false, "extend": true}}
+
+]
