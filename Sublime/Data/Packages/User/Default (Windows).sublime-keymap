@@ -37,6 +37,16 @@
 	{"keys": ["control+shift+i"], "command": "move", "args":{"by": "lines", "forward": false, "extend": true}},
 	{"keys": ["control+shift+k"], "command": "move", "args":{"by": "lines", "forward": true, "extend": true}},
 	{"keys": ["control+shift+l"], "command": "move", "args":{"by": "characters", "forward": true, "extend": true}},
-	{"keys": ["control+shift+j"], "command": "move", "args":{"by": "characters", "forward": false, "extend": true}}
+	{"keys": ["control+shift+j"], "command": "move", "args":{"by": "characters", "forward": false, "extend": true}},
 
+
+	//Groups
+	{ "keys": ["ctrl+shift+pageup"],  "command": "focus_neighboring_group", "args": {"forward": false} },
+	{ "keys": ["ctrl+shift+pagedown"],  "command": "focus_neighboring_group", "args": {"forward": true} },
+	{ "keys": ["ctrl+alt+shift+pageup"],  "command": "move_to_neighboring_group", "args": {"forward": false} },
+	{ "keys": ["ctrl+alt+shift+pagedown"],  "command": "move_to_neighboring_group", "args": {"forward": true} },
+
+
+	//Build
+	{ "keys": ["ctrl+alt+f7"], "command": "exec", "args": {"kill": true} }
 ]

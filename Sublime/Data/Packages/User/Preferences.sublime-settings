@@ -1,8 +1,12 @@
 {
-	"color_scheme": "Packages/Color Scheme - Default/MagicWB (Amiga).tmTheme",
-	"font_size": 19,
+	"color_scheme": "Packages/User/MagicWB (Amiga) (SL).tmTheme",
+	"font_face": "Inconsolata",
+	"font_size": 14,
 	"ignored_packages":
 	[
-		"Vintage"
-	]
+		"sublemacspro",
+		"Vintage",
+		"paredit"
+	],
+	"word_wrap": true
 }
