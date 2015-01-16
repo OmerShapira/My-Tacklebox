@@ -1,12 +1,16 @@
 {
-	"color_scheme": "Packages/User/MagicWB (Amiga) (SL).tmTheme",
-	"font_face": "Inconsolata",
-	"font_size": 14,
+	"color_scheme": "Packages/User/Monokai (SL).tmTheme",
+	"font_face": "PragmataPro",
+	"font_size": 13,
+	"highlight_line": true,
+	"highlight_modified_tabs": true,
 	"ignored_packages":
 	[
 		"sublemacspro",
 		"Vintage",
 		"paredit"
 	],
-	"word_wrap": true
+	"overlay_scroll_bars": "enabled",
+	"word_wrap": true,
+	"wrap_width": 100
 }

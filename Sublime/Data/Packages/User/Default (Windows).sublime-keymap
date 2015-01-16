@@ -1,10 +1,10 @@
 [
 	//Menu Toggles
-	{"keys": ["alt+k", "alt+t"], "command": "toggle_tabs"},
-	{"keys": ["alt+k", "alt+m"], "command": "toggle_minimap"},
-	{"keys": ["alt+k", "alt+,"], "command": "toggle_status_bar"},
-	{"keys": ["alt+k", "alt+f"], "command": "toggle_distraction_free"},
-	{"keys": ["alt+k", "alt+b"], "command": "toggle_side_bar"},
+	{"keys": ["alt+h", "alt+t"], "command": "toggle_tabs"},
+	{"keys": ["alt+h", "alt+m"], "command": "toggle_minimap"},
+	{"keys": ["alt+h", "alt+,"], "command": "toggle_status_bar"},
+	{"keys": ["alt+h", "alt+f"], "command": "toggle_distraction_free"},
+	{"keys": ["alt+h", "alt+b"], "command": "toggle_side_bar"},
 
 	//Enter Skips Ends
 	{"keys": ["shift+enter"], "command": "move", "args": {"by": "characters", "forward": true}, "context":
@@ -15,38 +15,50 @@
 	},
 
 	//move backspace
-	{ "keys" : ["control+u"], "command": "left_delete" },
-	{ "keys" : ["control+shift+u"], "command": "right_delete" },
+	{ "keys" : ["ctrl+u"], "command": "left_delete" },
+	{ "keys" : ["ctrl+shift+u"], "command": "right_delete" },
 
 	{"keys": ["shift+space"], "command": "move", "args": {"by": "subword_ends", "forward": true}},
-	{"keys": ["shift+alt+space"], "command": "move", "args": {"by": "subword_ends", "forward": false}},
+	{"keys": ["shift+alt+space"], "command": "move", "args": {"by": "subwords", "forward": true}},
+	{"keys": ["shift+ctrl+space"], "command": "move", "args": {"by": "subword_ends", "forward": false}},
+	{"keys": ["shift+ctrl+alt+space"], "command": "move", "args": {"by": "subwords", "forward": false}},
 
 	//modified navigation
-	{"keys": ["control+i"], "command": "move", "args":{"by": "lines", "forward": false}},
-	{"keys": ["control+k"], "command": "move", "args":{"by": "lines", "forward": true}},
-	{"keys": ["control+l"], "command": "move", "args":{"by": "characters", "forward": true}},
-	{"keys": ["control+j"], "command": "move", "args":{"by": "characters", "forward": false}},
+	{"keys": ["ctrl+i"], "command": "move", "args":{"by": "lines", "forward": false}},
+	{"keys": ["ctrl+l"], "command": "move", "args":{"by": "characters", "forward": true}},
+	{"keys": ["ctrl+j"], "command": "move", "args":{"by": "characters", "forward": false}},
+	{"keys": ["ctrl+k"], "command": "move", "args":{"by": "lines", "forward": true}},
+	{"keys": ["alt+i"], "command": "move_by_paragraph", "args":{"forward": false}},
+	{"keys": ["alt+k"], "command": "move_by_paragraph", "args":{"forward": true}},
+	{"keys": ["alt+l"], "command": "move", "args":{"by": "words", "forward": true}},
+	{"keys": ["alt+j"], "command": "move", "args":{"by": "words", "forward": false}},
+	{"keys": ["ctrl+alt+l"], "command": "move_to", "args":{"to": "eol"}},
+	{"keys": ["ctrl+alt+j"], "command": "move_to", "args":{"to": "bol"}},
+	{"keys": ["ctrl+alt+i"], "command": "move", "args":{"by" : "pages", "forward": false}},
+	{"keys": ["ctrl+alt+k"], "command": "move", "args":{"by": "pages", "forward": true}},
 
-	{"keys": ["control+alt+l"], "command": "move_to", "args":{"to": "eol"}},
-	{"keys": ["control+alt+j"], "command": "move_to", "args":{"to": "bol"}},
 
 	//Selection
-	{"keys": ["control+alt+shift+l"], "command": "move_to", "args":{"to": "eol", "extend" : true}},
-	{"keys": ["control+alt+shift+j"], "command": "move_to", "args":{"to": "bol"}, "extend" : true},
+	{"keys": ["ctrl+alt+shift+l"], "command": "move_to", "args":{"to": "eol", "extend" : true}},
+	{"keys": ["ctrl+alt+shift+j"], "command": "move_to", "args":{"to": "bol", "extend" : true}},
 
-	{"keys": ["control+shift+i"], "command": "move", "args":{"by": "lines", "forward": false, "extend": true}},
-	{"keys": ["control+shift+k"], "command": "move", "args":{"by": "lines", "forward": true, "extend": true}},
-	{"keys": ["control+shift+l"], "command": "move", "args":{"by": "characters", "forward": true, "extend": true}},
-	{"keys": ["control+shift+j"], "command": "move", "args":{"by": "characters", "forward": false, "extend": true}},
+	{"keys": ["ctrl+shift+i"], "command": "move", "args":{"by": "lines", "forward": false, "extend": true}},
+	{"keys": ["ctrl+shift+k"], "command": "move", "args":{"by": "lines", "forward": true, "extend": true}},
+	{"keys": ["ctrl+shift+l"], "command": "move", "args":{"by": "characters", "forward": true, "extend": true}},
+	{"keys": ["ctrl+shift+j"], "command": "move", "args":{"by": "characters", "forward": false, "extend": true}},
 
 
 	//Groups
-	{ "keys": ["ctrl+shift+pageup"],  "command": "focus_neighboring_group", "args": {"forward": false} },
-	{ "keys": ["ctrl+shift+pagedown"],  "command": "focus_neighboring_group", "args": {"forward": true} },
-	{ "keys": ["ctrl+alt+shift+pageup"],  "command": "move_to_neighboring_group", "args": {"forward": false} },
-	{ "keys": ["ctrl+alt+shift+pagedown"],  "command": "move_to_neighboring_group", "args": {"forward": true} },
-
+	{ "keys": ["ctrl+alt+]"],  "command": "focus_neighboring_group", "args": {"forward": false} },
+	{ "keys": ["ctrl+alt+["],  "command": "focus_neighboring_group", "args": {"forward": true} },
+	{ "keys": ["ctrl+alt+shift+]"],  "command": "move_to_neighboring_group", "args": {"forward": false} },
+	{ "keys": ["ctrl+alt+shift+["],  "command": "move_to_neighboring_group", "args": {"forward": true} },
 
 	//Build
-	{ "keys": ["ctrl+alt+f7"], "command": "exec", "args": {"kill": true} }
+	{ "keys": ["ctrl+alt+f7"], "command": "exec", "args": {"kill": true} },
+
+	//Indent
+	{"keys": ["ctrl+."], "command": "indent"},
+	{"keys": ["ctrl+,"], "command": "unindent"},
+	
 ]
