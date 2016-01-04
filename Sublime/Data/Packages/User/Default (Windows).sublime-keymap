@@ -118,5 +118,27 @@
 	{"keys": ["ctrl+."], "command": "indent"},
 	{"keys": ["ctrl+,"], "command": "unindent"},
 
+
+
+	// Vintage Mode
+	{ 
+		"keys": ["j", "j"], "command": "exit_insert_mode",
+		"context":
+		[
+			{ "key": "setting.command_mode", "operand": false },
+			{ "key": "setting.is_widget", "operand": false }
+		]
+	},
+
+	// Vintageous
+	{
+        "keys": ["j", "j"],
+        "command": "_enter_normal_mode",
+        "args": {
+            "mode": "mode_insert"
+        },
+        "context": [{"key": "vi_insert_mode_aware"}]
+    },
 	
+		
 ]
