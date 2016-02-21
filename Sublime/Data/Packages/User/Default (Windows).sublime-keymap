@@ -47,12 +47,69 @@
 	{"keys": ["ctrl+shift+l"], "command": "move", "args":{"by": "characters", "forward": true, "extend": true}},
 	{"keys": ["ctrl+shift+j"], "command": "move", "args":{"by": "characters", "forward": false, "extend": true}},
 
+	
+	//Origami, see : https://github.com/SublimeText/Origami/blob/master/Origami.sublime-commands
+	{ "keys": ["alt+`", "up"], "command": "travel_to_pane", "args": {
+		"direction": "up"
+	}},
+	{ "keys": ["alt+`", "down"], "command": "travel_to_pane", "args": {
+		"direction": "down"
+	}},
+	{ "keys": ["alt+`", "right"], "command": "travel_to_pane", "args": {
+		"direction": "right"
+	}},
+	{ "keys": ["alt+`", "left"], "command": "travel_to_pane", "args": {
+		"direction": "left"
+	}},
 
-	//Groups
-	{ "keys": ["ctrl+alt+]"],  "command": "focus_neighboring_group", "args": {"forward": false} },
-	{ "keys": ["ctrl+alt+["],  "command": "focus_neighboring_group", "args": {"forward": true} },
-	{ "keys": ["ctrl+alt+shift+]"],  "command": "move_to_neighboring_group", "args": {"forward": false} },
-	{ "keys": ["ctrl+alt+shift+["],  "command": "move_to_neighboring_group", "args": {"forward": true} },
+	{ "keys": ["alt+`", "shift+up"], "command": "carry_file_to_pane", "args": {
+		"direction": "up"
+	}},
+	{ "keys": ["alt+`", "shift+down"], "command": "carry_file_to_pane", "args": {
+		"direction": "down"
+	}},
+	{ "keys": ["alt+`", "shift+right"], "command": "carry_file_to_pane", "args": {
+		"direction": "right"
+	}},
+	{ "keys": ["alt+`", "shift+left"], "command": "carry_file_to_pane", "args": {
+		"direction": "left"
+	}},
+
+	{ "keys": ["alt+`", "ctrl+up"], "command": "create_pane", "args": {
+		"direction": "up", "give_focus": true
+	}},
+	{ "keys": ["alt+`", "ctrl+down"], "command": "create_pane", "args": {
+		"direction": "down", "give_focus": true
+	}},
+	{ "keys": ["alt+`", "ctrl+right"], "command": "create_pane", "args": {
+		"direction": "right", "give_focus": true
+	}},
+	{ "keys": ["alt+`", "ctrl+left"], "command": "create_pane", "args": {
+		"direction": "left", "give_focus": true
+	}},
+
+	{ "keys": ["alt+`", "ctrl+shift+up"], "command": "clone_file_to_pane", "args": {
+		"direction": "up"
+	}},
+	{ "keys": ["alt+`", "ctrl+shift+down"], "command": "clone_file_to_pane", "args": {
+		"direction": "down"
+	}},
+	{ "keys": ["alt+`", "ctrl+shift+right"], "command": "clone_file_to_pane", "args": {
+		"direction": "right"
+	}},
+	{ "keys": ["alt+`", "ctrl+shift+left"], "command": "clone_file_to_pane", "args": {
+		"direction": "left"
+	}},
+
+	{ "keys": ["alt+`", "backspace"], "command": "destroy_pane", "args": {
+		"direction": "self"
+	}},
+
+	{ "keys": ["alt+`", "`"], "command": "toggle_zoom_pane", "args": {
+		"fraction": 0.85
+	}},
+
+
 
 	//Build
 	{ "keys": ["ctrl+alt+f7"], "command": "exec", "args": {"kill": true} },
@@ -60,5 +117,6 @@
 	//Indent
 	{"keys": ["ctrl+."], "command": "indent"},
 	{"keys": ["ctrl+,"], "command": "unindent"},
+
 	
 ]
