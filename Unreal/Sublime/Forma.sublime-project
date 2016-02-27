@@ -1,0 +1,24 @@
+{
+	// Example Unreal Project
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	],
+	"linters" : 
+	{
+		"annotations": 
+		{
+			"warnings": ["TODO", "HACK"],
+			"errors" : ["FIXME"],
+		}
+	},
+	"build_systems":
+	[
+		{
+			"name" : "[BUILD] Debug Editor (x64)",
+			"cmd" : ["powershell","& \"C:\\Program Files\\Epic Games\\4.9\\Engine\\Build\\BatchFiles\\Build.bat\" Win64 FormaEditor Win64 DebugGame \"$project_path\\Forma.uproject\" -rocket -waitmutex"],
+		},
+	]
+}
