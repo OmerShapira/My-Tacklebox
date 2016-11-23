@@ -1,0 +1,20 @@
+
+nmap <C-i> :vsc View.NavigateBackward<CR> 
+nmap <C-o> :vsc View.NavigateForward<CR>
+
+nmap <Space><Space> :vsc Window.ActivateQuickLaunch<CR>
+
+imap jj <Esc>  
+imap fd <Esc>  
+nmap <C-,> :vsc Edit.LineDown<CR>
+nmap <C-.> :vsc Edit.LineUp<CR>
+
+
+set backspace=indent,eol,start
+
+set ttimeout
+set ttimeoutlen=100
+
+set incsearch
+" Use <C-L> to clear the highlighting of :set hlsearch.
+
