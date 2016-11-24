@@ -3,8 +3,10 @@ Written by Omer Shapira
 
 """
 import os
-import argparse
 import sys
+import ctypes 			#for windows admin checking
+
+import argparse
 import ConfigParser
 
 
@@ -99,6 +101,16 @@ def check_git_repo(path):
 	#TODO (OS): Make
 	pass
 
+def halt_if_admin():
+	try:
+ 		is_admin = os.getuid() == 0
+	except AttributeError:
+		is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
+
+	if is_admin:
+		exit("Tacklebox won't run under admin privilieges. You might hurt yourself.")
+
+
 def main():
 	parser = argparse.ArgumentParser()
 	subparsers = parser.add_subparsers(help="Options:") 
@@ -123,8 +135,13 @@ def main():
 	parser_snip = subparsers.add_parser('snip', help="pastes a snippet")	
 	parser_clip = subparsers.add_parser('clip', help="pastes a snippet into the clipboard")	
 
-
+	# Read
 	args = parser.parse_args()
+
+	# Safety check
+	halt_if_admin()
+
+	# Execute!
 	args.func(args)
 
 
