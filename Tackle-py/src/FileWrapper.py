@@ -1,6 +1,7 @@
 import errno
 import os
-
+import toml
+import consts
 
 class FileWrapper:
     def __init__(self, path, mode, warn_if_created=False):
@@ -38,4 +39,10 @@ class FileWrapper:
     def __exit__(self, exc_type, exc_value, exc_tb):
         self.handle.close()
 
+
+class ConfigFile:
+    def __init__(self, basepath, kind="bait"):
+        self.path = basepath
+        #Check if parent exists:
+        # parent_path = os.path.realpath("../")
 
