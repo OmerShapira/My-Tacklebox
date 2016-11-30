@@ -5,10 +5,11 @@ Written by Omer Shapira
 import os
 import sys
 import ctypes 			#for windows admin checking
-
 import argparse
 
+# Modules
 import config
+import mvactions
 
 
 '''
@@ -17,13 +18,13 @@ Usage
 tackle
 (usage)
 
-tackle put all
-tackle put vimrc
-tackle pop vimrc
+tackle hook all
+tackle hook vimrc
+tackle unhook vimrc
 
 tackle fetch
 (pull changes)
-tackle rerfresh [bait/file]
+tackle refresh [bait/file]
 (deploy changes)
 tackle collect [bait/file]
 (collects changes to baits and pushes them)
@@ -38,11 +39,11 @@ tackle snip glsl/noise
 tackle snip -c glsl/nosie
 tackle clip glsl/noise
 
+tackle wipe # clear everything from the computer
 
 State:
 ~/.tacklebox/
-  - backup/
-  - 
+  - .backup/
   - state.tackle
 
 
@@ -64,9 +65,9 @@ def halt_if_admin():
 
 def main():
 	parser = argparse.ArgumentParser()
-	subparsers = parser.add_subparsers(help="Options:") 
+	subparsers = parser.add_subparsers(help="Options:")
 
-	parser_config = subparsers.add_parser('config', help="configure the project")	
+	parser_config = subparsers.add_parser('config', help="configure the project")
 	parser_config.add_argument('path', type=str)
 	parser_config.set_defaults(func=config.config)
 
@@ -75,7 +76,7 @@ def main():
 	parser_put.add_argument('--path', type=str, action='store')
 
 	parser_pop = subparsers.add_parser('pop', help="remove an asset, restore the previous one from backup if possible")
-	parser_pop.add_argument('config_name')	
+	parser_pop.add_argument('config_name')
 
 	parser_fetch = subparsers.add_parser('fetch', help="pull the latest from remote repository, point repository to head of the current branch.")
 
@@ -83,8 +84,8 @@ def main():
 
 	parser_collect = subparsers.add_parser('collect', help="adds a deployed asset into the repository and pushes to the remote repository, if exists.")
 
-	parser_snip = subparsers.add_parser('snip', help="pastes a snippet")	
-	parser_clip = subparsers.add_parser('clip', help="pastes a snippet into the clipboard")	
+	parser_snip = subparsers.add_parser('snip', help="pastes a snippet")
+	parser_clip = subparsers.add_parser('clip', help="pastes a snippet into the clipboard")
 
 	# Read
 	args = parser.parse_args()

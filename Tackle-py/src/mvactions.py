@@ -21,24 +21,30 @@ def pop(cl_args):
 
 
 def collect(cl_args):
-    pass 
+    pass
 
-class file_replacement_op:
+class op_file_placement:
     def __init__(self, source_dir, backup_dir):
         pass
-    
-    def exec(self):
+
+    def execute(self):
         """
-        check if folder can accept files
-        check if folder needs backup
+        check if target folder can accept files
+        check if target folder needs backup
         check write permissions
         acquire locks
-        backup
-        place new files
+        exchange new files
         """
         pass
 
+    @with_permissions_checked(staged=False, backup=True)
     def move_to_backup(self):
         pass
-    
-     
+
+    @with_permissions_checked(staged=True, backup=False)
+    def move_from_backup(self):
+        pass
+
+    def get_backup_pointer(self):
+        #filter backup folder by .tacklebait.###
+        pass
