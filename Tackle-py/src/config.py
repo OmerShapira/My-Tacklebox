@@ -4,8 +4,6 @@ Written by Omer Shapira"""
 
 # TODO (OS): Change to toml
 
-
-
 import os
 import errno
 import ConfigParser
@@ -51,6 +49,7 @@ class config_file:
 
 def config(args):
 	'''Handle the 'config' command'''
+    # Check if path exists
 	if not os.path.exists(args.path):
 		exit("Path does not exist: " + args.path )
 
@@ -59,6 +58,13 @@ def config(args):
 	if not os.path.exists(os.path.join(path, ".git")):
 		exit("No git repository at " + path)
 
+# Check user folder access
+# using os.access(file)
+# Check if backups exist there
+# If yes, archive (add a .n number at end) by default
+
+
+# Then create new file
 	with config_file() as f:
 		f.set("Repository", "Path", path)
 	return
