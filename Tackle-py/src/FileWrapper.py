@@ -66,7 +66,7 @@ class Folder(object):
         self.path = os.path.realpath(path)
 
     def exists(self):
-        return os.path.exists(self.path) && os.path.isdir(self.path)
+        return os.path.exists(self.path) and os.path.isdir(self.path)
 
     def ensure_exists(self):
         if self.exists():
@@ -102,7 +102,7 @@ class Folder(object):
 
     def child_names(self, dirs=True, files=True):
         raw =  os.listdir(self.path)
-        if files && dirs:
+        if files and dirs:
             return raw
         l_files = [] if not files else [f for f in raw if os.path.isfile(f)]
         l_dirs  = [] if not dirs  else [d for f in raw if os.path.isdir(d)]
@@ -168,7 +168,7 @@ class UserConfigFolder(object):
         """
         names = [n for n in self.folder.child_names(files=False)
                     if (n.startswith(consts.BACKUP_DIR_NAME)
-                    && not n.endswith(consts.CONFIG_EXTENSION_CURRENT))]
+                    and not n.endswith(consts.CONFIG_EXTENSION_CURRENT))]
         highest_num = 0
         for name in names:
             #take last string beyond point
