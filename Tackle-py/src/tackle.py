@@ -8,7 +8,7 @@ import ctypes 			#for windows admin checking
 import argparse
 
 # Modules
-import config
+import src.config
 import mvactions
 
 
@@ -49,9 +49,6 @@ State:
 
 '''
 
-def check_git_repo(path):
-	#TODO (OS): Make
-	pass
 
 def halt_if_admin():
 	try:

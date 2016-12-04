@@ -1,14 +1,13 @@
+"""File and Folder wrappers"""
 import os
 from contextlib import contextmanager
 from collections import MutableMapping
-import toml
-import src.consts as consts
-
 import shutil #used for rmtree
-
 from time import time
 
+import toml
 
+import src.consts as consts
 
 
 class FileWrapper(object):
@@ -112,7 +111,7 @@ class Folder(object):
         if files and dirs:
             return raw
         l_files = [] if not files else [f for f in raw if os.path.isfile(f)]
-        l_dirs  = [] if not dirs  else [d for f in raw if os.path.isdir(d)]
+        l_dirs  = [] if not dirs  else [d for d in raw if os.path.isdir(d)]
         return l_files + l_dirs
 
 
@@ -159,8 +158,7 @@ class UserConfigFolder(object):
         self.push_backup()
         # Set up backup
         self.folder.child(self.backup_folder_name).ensure_exists()
-        # TODO (OS): this doesn't exist yet.
-        self.config_file.ensure_exists()
+        self.config_file.create()
 
     def destroy(self):
         self.pop_backup()
@@ -215,7 +213,7 @@ class UserConfigFolder(object):
             numstr = name.split(".")[-1]
             try:
                 highest_num = max(highest_num, int(numstr))
-            except:
+            except E:
                 pass
         return highest_num
 
@@ -239,43 +237,78 @@ def check_lock_mark_dirty(fn):
     return checked
 
 
-class ConfigFile(object):
+class ConfigFile(MutableMapping):
+    """Efficient disk-mapped TOML file wrapper"""
     def __init__(self, path):
         self.path = path
-        self.last_read = None
-        self.dirty = False
-        self.db = {}
+        if not os.path.exists(path):
+            raise ValueError(path + "Doesn't exist")
+        self.__db = {}
+        self.lock = True
+        self.dirty = True
+        self.__last_load = .0
+        self.load()
+
+    @reload_if_stale
+    def __getitem__(self, key):
+        # TODO(OS): child dicts still mutable
+        return self.__db.__getitem__(key)
+
+    @reload_if_stale
+    def __contains__(self, key):
+        return self.__db.__contains__(key)
+
+    @reload_if_stale
+    def __len__(self):
+        return self.__db.__len__()
+
+    @reload_if_stale
+    def __iter__(self):
+        return self.__db.__iter__()
+
+    @check_lock_mark_dirty
+    def __setitem__(self, key, value):
+        self.__db.__setitem__(key, value)
+
+    @check_lock_mark_dirty
+    def __delitem__(self, key):
+        self.__db.__delitem__(key)
 
     def exists(self):
         return os.path.exists(self.path)
 
-    def is_stale(self):
-        """Checks if the file was modified after the last read."""
-        if self.last_read is None:
-            return True
-        return float(os.path.getmtime(self.path)) > self.last_read
-    
-    def get(self,item):
-        if self.is_stale():
-            self.load()
-        self.db.get(item, None)
-
-    def set(self, item, value):
-        self.db[item] = value
-        # TODO (OS): Defer saving
-        self.save()
-
-    def delete(self, item):
-        if item in self.db:
-            del self.db[item]
-
     def load(self):
+        """Cache the file onto self.__db, and mark the time it was loaded"""
         with open(self.path, 'r') as f:
-            self.db = toml.loads(f.read())
-            self.last_read = float(time())
+            self.__db = toml.load(f)
+            self.__last_load = time()
 
-    def save(self):
-        pass
+    def clear(self):
+        """deletes both the cache and the disk file contents. leaves an empty file
+        creates an empty file if didn't exist."""
+        with self.mutable():
+            self.__db = {}
+
+    def is_stale(self):
+        return self.__last_load < os.path.getmtime(self.path)
+
+    @contextmanager
+    def mutable(self):
+        """NOT THREAD SAFE. FFS. DON'T."""
+        # First, refresh the file
+        if self.is_stale():
+            try:
+                self.load()
+            except IOError as E:
+                #All this means is the file doesn't exist, we just create one
+                pass
+        self.lock = False
+        yield self
+        with open(self.path, 'w') as f:
+            self.__db = toml.dump(self.__db, f)
+        self.lock = True
+        self.dirty = False
+
 
 class BaitConfigFile(ConfigFile):
     def __init__(self, path):
@@ -294,72 +327,40 @@ class UserConfigFile(ConfigFile):
         self.config_folder = config_folder
         self.repo_path = repo_path
 
-    def is_valid(self):
-        return self.does_point_to_git_repo()
+    def create(self):
+        #TODO(OS): use schema
+        with self.mutable():
+            self['version'] = consts.VERSION
+            self['repo'] = {}
+            self['repo']['active'] = 'master'
+            self['repo']['master'] = {}
+            self['repo']['master']['root'] = self.repo_path
+            self['repo']['master']['type'] = 'git'
 
-    def does_point_to_git_repo(self):
-        """Checks only by name. If you're gonna play evil, I'm not going to catch it."""
-        if not self.exists():
+
+    def is_valid(self):
+        if not self.does_point_to_git_repo():
             return False
-        #TODO (OS): not enough. need to read from file.
-        repo_path = os.path.join(self.config_folder.path, ".git")
-        if not os.path.exists(repo_path):
+        try:
+            pv, fv = consts.VERSION, self['version']
+            assert pv == fv, "Config file version ("+fv+") does not match the program version ("+pv+")"
+            root = self['repo']['master']['root']
+            assert is_git_repo(root), root + " is not a git repo"
+        except AssertionError as E:
+            print "Error: " + E
+            return False
+        except E:
+            print "Unknown Error: " + E
             return False
         return True
 
-class ProtectedTOMLFileWrapper(MutableMapping):
-    """Efficient disk-mapped file wrapper"""
-    def __init__(self, path):
-        self.path = path
-        if not os.path.exists(path):
-            raise ValueError(path + "Doesn't exist")
-        self.__db = {}
-        self.lock = True
-        self.dirty = True
-        self.__last_load = .0
-        self.load()
+    def does_point_to_git_repo(self):
+        """Checks only by name. If you're gonna play evil, I'm not going to catch it."""
+        return is_git_repo(self.repo_path)
 
-    @reload_if_stale
-    def __getitem__(self, key):
-        return self.__db.__getitem__(key)
-
-    @reload_if_stale
-    def __len__(self):
-        return self.__db.__len__()
-
-    @reload_if_stale
-    def __iter__(self):
-        return self.__db.__iter__()
-
-    @check_lock_mark_dirty
-    def __setitem__(self, key, value):
-        self.__db.__setitem__(key, value)
-
-    @check_lock_mark_dirty
-    def __delitem__(self, key):
-        self.__db.__delitem__(key)
-
-
-    def load(self):
-        """Cache the file onto self.__db, and mark the time it was loaded"""
-        with open(self.path, 'r') as f:
-            self.__db = toml.load(f)
-            self.__last_load = time()
-
-    def is_stale(self):
-        return self.__last_load < os.path.getmtime(self.path)
-
-    @contextmanager
-    def mutable(self):
-        """NOT THREAD SAFE. FFS. DON'T."""
-        # First, refresh the file
-        if self.is_stale():
-            self.load()
-        self.lock = False
-        yield self
-        with open(self.path, 'w') as f:
-            self.__db = toml.dump(self.__db, f)
-        self.lock = True
-        self.dirty = False
-
-
+def is_git_repo(path):
+    repo_path = os.path.join(path, ".git")
+    if not os.path.exists(repo_path):
+        return False
+    #TODO (OS): actually check repo
+    return True
