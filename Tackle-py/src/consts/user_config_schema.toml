@@ -3,8 +3,11 @@
 version = "0.1"
 
 [repo]
-active= 'master'
+active= 'main'
 
-    [repo.master]
+    [repo.main]
     root='C:\Users\omer\My_Tacklebox'
     type="git"
+
+[bait]
+    [bait.home]
