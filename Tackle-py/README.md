@@ -53,11 +53,13 @@ tackle wipe
 
 ```
 
-## Goals
-
+## #Goals
+Since Tacklebox was designed with a specific use case in mind, it also comes with an aesthetic. It needs to:
+* Be dead simple for anyone already used to git
+* Be fast and helpful, not full of obscure features.
 * Support other repos, like `svn`, `dropbox`, or `http` (to allow for a repo just for your private keys, and one you share with your organization)
-* As little changes to the schema as possible.
-* Allow editor integration
+* Once stable, change as little as possible.
+* Allow editor integration, because we all love ordering ramen through emacs.
 * Be stable for as long as possible, never destroy anybody's hard drive.
 
 ## FAQs
