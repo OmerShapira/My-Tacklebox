@@ -1,4 +1,12 @@
 # Tacklebox
+Tacklebox is a configuration manager for people working on multiple computers. It handles:
+* Making your local settings portable
+* Updating any changes you make to your settings back into your collection
+* Backing up anyone else's local settings while you work
+* Searching snippets and other things you need
+* Cleaning up after you're done with a computer
+
+Tacklebox uses git as a backend. Any changes you make will be pushed back into your remote git repository.
 ## Usage
 
 ``` bash
