@@ -1,15 +1,17 @@
-import errno
 import os
 import toml
-import consts
+import src.consts as consts
 
 import shutil #used for rmtree
+
+from time import time
 
 class FileWrapper(object):
     def __init__(self, path, mode, warn_if_created=False):
         self.warn_if_created = warn_if_created
         self.mode = mode
         self.set_path(path)
+        self.handle = None
 
     def set_path(self, path):
         self.path = os.path.realpath(path)
@@ -33,7 +35,7 @@ class FileWrapper(object):
         try:
             self.ensure_path_exists()
             handle = open(self.path)
-            close(handle)
+            handle.close()
         except IOError as E:
             raise
 
@@ -52,7 +54,7 @@ class FileWrapper(object):
         self.ensure_path_exists()
         if self.warn_if_created:
             print "Creating " + self.path
-        self.handle = open(self.path, mode)
+        self.handle = open(self.path, self.mode)
         return self.handle
 
     def __exit__(self, exc_type, exc_value, exc_tb):
@@ -101,7 +103,7 @@ class Folder(object):
         return Folder(os.path.realpath(os.path.join(self.path, os.pardir)))
 
     def child_names(self, dirs=True, files=True):
-        raw =  os.listdir(self.path)
+        raw = os.listdir(self.path)
         if files and dirs:
             return raw
         l_files = [] if not files else [f for f in raw if os.path.isfile(f)]
@@ -110,15 +112,40 @@ class Folder(object):
 
 
 class UserConfigFolder(object):
+    """Docstrring for UserConfigFolder"""
     def __init__(self, path=None):
         path = os.path.expanduser(consts.USER_CONFIG_HOME)
         self.folder = Folder(path)
-        self.backup_folder_name = consts.BACKUP_DIR_NAME + CONFIG_EXTENSION_CURRENT
+        self.backup_folder_name = consts.BACKUP_DIR_NAME + consts.CONFIG_EXTENSION_CURRENT
         self.config_file_name = consts.USER_CONFIG_FILE_NAME
+        self.config_file = UserConfigFile(self)
+
+    def exists(self):
+        """Check if:
+        * Folder Exists
+        * Configuration file exists
+        """
+        return self.folder.exists() and self.config_file.exists()
+
+    def is_valid(self):
+        """Check if:
+        * The folder, files exist
+        * The git repo it is referring to exists
+        * The location is read/write accessible
+        """
+        ret = True
+        ret &= self.exists()
+        ret &= self.config_file.is_valid() 
+        ret &= os.access(self.folder.path, os.R_OK)
+        ret &= os.access(self.folder.path, os.W_OK)
+        return ret
 
     def create(self):
+        # Set up root
         self.folder.ensure_exists()
+        # Clean up previous backups, if they exist
         self.push_backup()
+        # Set up backup
         self.folder.child(self.backup_folder_name).ensure_exists()
         #TODO (OS): Create config file
 
@@ -183,6 +210,40 @@ class UserConfigFolder(object):
 class ConfigFile(object):
     def __init__(self, path):
         self.path = path
+        self.last_read = None
+        self.dirty = False
+        self.db = {}
+
+    def exists(self):
+        return os.path.exists(self.path)
+
+    def is_stale(self):
+        """Checks if the file was modified after the last read."""
+        if self.last_read is None:
+            return True
+        return float(os.path.getmtime(self.path)) > self.last_read
+    
+    def get(self,item):
+        if self.is_stale():
+            self.load()
+        self.db.get(item, None)
+
+    def set(self, item, value):
+        self.db[item] = value
+        # TODO (OS): Defer saving
+        self.save()
+
+    def delete(self, item):
+        if item in self.db:
+            del self.db[item]
+
+    def load(self):
+        with open(self.path, 'r') as f:
+            self.db = toml.loads(f.read())
+            self.last_read = float(time())
+
+    def save(self):
+        pass
 
 class BaitConfigFile(ConfigFile):
     def __init__(self, path):
@@ -192,6 +253,24 @@ class BaitConfigFile(ConfigFile):
 class UserConfigFile(ConfigFile):
     '''refers to user config file only by name.
     performs atomic actions and keeps file closed.'''
-    def __init__(self, config_folder)
-        path = os.path.expanduser(consts.USER_CONFIG_HOME)
-        super(UserConfigFile, self).init(self, path)
+    def __init__(self, config_folder):
+        path = os.path.join(
+            self.path.expanduser(consts.USER_CONFIG_HOME),
+            consts.USER_CONFIG_FILE_NAME)
+        super(UserConfigFile, self).__init__(self, path)
+        #TODO (OS): remove coupling
+        self.config_folder = config_folder
+
+    def is_valid(self):
+        return self.does_point_to_git_repo()
+
+    def does_point_to_git_repo(self):
+        if not self.exists():
+            return False
+        repo_path = os.path.join(self.config_folder.path, ".git")
+        if not os.path.exists(repo_path):
+            return False
+        #TODO (OS): Check if this is a real git repo
+        return True
+
+# TODO (OS): Create mutable mapping

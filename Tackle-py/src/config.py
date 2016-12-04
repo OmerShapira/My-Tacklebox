@@ -7,6 +7,7 @@ Written by Omer Shapira"""
 import os
 import errno
 import ConfigParser
+from src.FileWrapper import UserConfigFolder
 
 class config_file:
 
@@ -34,7 +35,7 @@ class config_file:
 				self.config_parser.write(file_handle)
 		except E:
             if E.errno != errno.EEXIST: #we're ok with the path existing
-                 raise
+                raise
 
 		return self
 
@@ -58,6 +59,7 @@ def config(args):
 	if not os.path.exists(os.path.join(path, ".git")):
 		exit("No git repository at " + path)
 
+    config_folder = UserConfigFolder()
 # Check user folder access
 # using os.access(file)
 # Check if backups exist there
