@@ -1,10 +1,15 @@
 import os
+from contextlib import contextmanager
+from collections import MutableMapping
 import toml
 import src.consts as consts
 
 import shutil #used for rmtree
 
 from time import time
+
+
+
 
 class FileWrapper(object):
     def __init__(self, path, mode, warn_if_created=False):
@@ -113,12 +118,12 @@ class Folder(object):
 
 class UserConfigFolder(object):
     """Docstrring for UserConfigFolder"""
-    def __init__(self, path=None):
+    def __init__(self, repo_path, path=None):
         path = os.path.expanduser(consts.USER_CONFIG_HOME)
         self.folder = Folder(path)
         self.backup_folder_name = consts.BACKUP_DIR_NAME + consts.CONFIG_EXTENSION_CURRENT
         self.config_file_name = consts.USER_CONFIG_FILE_NAME
-        self.config_file = UserConfigFile(self)
+        self.config_file = UserConfigFile(self, repo_path)
 
     def exists(self):
         """Check if:
@@ -126,6 +131,12 @@ class UserConfigFolder(object):
         * Configuration file exists
         """
         return self.folder.exists() and self.config_file.exists()
+
+    def ensure_exists(self):
+        if self.exists() and self.is_valid():
+            return
+        else:
+            self.create()
 
     def is_valid(self):
         """Check if:
@@ -141,13 +152,15 @@ class UserConfigFolder(object):
         return ret
 
     def create(self):
+        """Crates a new folder. If an old one exists, pushes it to backup."""
         # Set up root
         self.folder.ensure_exists()
         # Clean up previous backups, if they exist
         self.push_backup()
         # Set up backup
         self.folder.child(self.backup_folder_name).ensure_exists()
-        #TODO (OS): Create config file
+        # TODO (OS): this doesn't exist yet.
+        self.config_file.ensure_exists()
 
     def destroy(self):
         self.pop_backup()
@@ -206,6 +219,25 @@ class UserConfigFolder(object):
                 pass
         return highest_num
 
+## Some Decorators
+
+def reload_if_stale(fn):
+    """Decorator to reload a protected file before exposing values"""
+    def fresh(self, *args):
+        if self.is_stale() and not self.lock:
+            self.load()
+        return fn(self, *args)
+    return fresh
+
+def check_lock_mark_dirty(fn):
+    """Decorator to allow protected file access"""
+    def checked(self, *args):
+        if self.lock:
+            return ValueError("Object is locked. use .mutable instead")
+        fn(self, *args)
+        self.dirty = True
+    return checked
+
 
 class ConfigFile(object):
     def __init__(self, path):
@@ -253,24 +285,81 @@ class BaitConfigFile(ConfigFile):
 class UserConfigFile(ConfigFile):
     '''refers to user config file only by name.
     performs atomic actions and keeps file closed.'''
-    def __init__(self, config_folder):
+    def __init__(self, config_folder, repo_path):
         path = os.path.join(
             self.path.expanduser(consts.USER_CONFIG_HOME),
             consts.USER_CONFIG_FILE_NAME)
         super(UserConfigFile, self).__init__(self, path)
         #TODO (OS): remove coupling
         self.config_folder = config_folder
+        self.repo_path = repo_path
 
     def is_valid(self):
         return self.does_point_to_git_repo()
 
     def does_point_to_git_repo(self):
+        """Checks only by name. If you're gonna play evil, I'm not going to catch it."""
         if not self.exists():
             return False
+        #TODO (OS): not enough. need to read from file.
         repo_path = os.path.join(self.config_folder.path, ".git")
         if not os.path.exists(repo_path):
             return False
-        #TODO (OS): Check if this is a real git repo
         return True
 
-# TODO (OS): Create mutable mapping
+class ProtectedTOMLFileWrapper(MutableMapping):
+    """Efficient disk-mapped file wrapper"""
+    def __init__(self, path):
+        self.path = path
+        if not os.path.exists(path):
+            raise ValueError(path + "Doesn't exist")
+        self.__db = {}
+        self.lock = True
+        self.dirty = True
+        self.__last_load = .0
+        self.load()
+
+    @reload_if_stale
+    def __getitem__(self, key):
+        return self.__db.__getitem__(key)
+
+    @reload_if_stale
+    def __len__(self):
+        return self.__db.__len__()
+
+    @reload_if_stale
+    def __iter__(self):
+        return self.__db.__iter__()
+
+    @check_lock_mark_dirty
+    def __setitem__(self, key, value):
+        self.__db.__setitem__(key, value)
+
+    @check_lock_mark_dirty
+    def __delitem__(self, key):
+        self.__db.__delitem__(key)
+
+
+    def load(self):
+        """Cache the file onto self.__db, and mark the time it was loaded"""
+        with open(self.path, 'r') as f:
+            self.__db = toml.load(f)
+            self.__last_load = time()
+
+    def is_stale(self):
+        return self.__last_load < os.path.getmtime(self.path)
+
+    @contextmanager
+    def mutable(self):
+        """NOT THREAD SAFE. FFS. DON'T."""
+        # First, refresh the file
+        if self.is_stale():
+            self.load()
+        self.lock = False
+        yield self
+        with open(self.path, 'w') as f:
+            self.__db = toml.dump(self.__db, f)
+        self.lock = True
+        self.dirty = False
+
+
