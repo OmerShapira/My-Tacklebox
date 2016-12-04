@@ -7,8 +7,7 @@ import ctypes           #for windows admin checking
 import argparse
 
 # Modules
-import config
-import mvactions
+from commands import config, mvactions
 
 
 def halt_if_admin():

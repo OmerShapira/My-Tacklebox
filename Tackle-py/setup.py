@@ -1,10 +1,10 @@
 # Setup.py
 
 from setuptools import setup
-
+from src.consts import consts
 
 setup(name='tacklebox',
-      version='0.1',
+      version=consts.VERSION,
       description='portable configuration manager',
       url='http://github.com/OmerShapira/Tacklebox',
       author='Omer Shapira',
@@ -13,5 +13,6 @@ setup(name='tacklebox',
       packages=['tacklebox'],
       install_requires=[
           'toml',
+          'GitPython'
       ],
       zip_safe=False)

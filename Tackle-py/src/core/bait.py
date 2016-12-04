@@ -1,5 +1,5 @@
 import toml
-import FileWrapper
+import fileutils
 
 
 class Bait:

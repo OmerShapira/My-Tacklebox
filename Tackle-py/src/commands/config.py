@@ -3,7 +3,7 @@ Written by Omer Shapira"""
 
 
 import os
-from FileWrapper import UserConfigFolder
+from core.fileutils import UserConfigFolder
 
 def config(args):
     '''Handle the 'config' command'''
