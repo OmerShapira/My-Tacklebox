@@ -18,7 +18,7 @@ tackle hook all
 tackle hook vimrc
 # stages vimrc, backing up the previous one if it exists
 tackle hook --overwrite vimrc
-stages vimrc without backing up previous versions.
+# stages vimrc without backing up previous versions.
 tackle unhook vimrc
 # unstages vimrc, restoring backups.
 
@@ -31,6 +31,11 @@ tackle collect [bait/file]
 
 tackle inventory
 # (shows baits)
+
+tackle bait --new NAME [PATH]
+# starts a new bait with NAME in the current config.
+# if PATH is added, marks any files added from local machine to be left there when done.
+
 
 tackle snip glsl
 # (returns a list of all glsl snippets)

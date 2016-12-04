@@ -5,4 +5,4 @@ USER_CONFIG_FILE_NAME = ".tackleboxconfig"
 BACKUP_DIR_NAME = ".tackleback"
 CONFIG_EXTENSION_CURRENT = ".current"
 USER_CONFIG_HOME = "~"
-VERSION = 0.1
+VERSION = "0.1"

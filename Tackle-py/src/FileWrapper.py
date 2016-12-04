@@ -7,7 +7,7 @@ from time import time
 
 import toml
 
-import src.consts as consts
+import consts
 
 
 class FileWrapper(object):
